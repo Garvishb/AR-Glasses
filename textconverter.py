@@ -13,15 +13,16 @@ language = "french"
 def translate():
     transcript_result = transcript_queue.get() # Store live transcript
     response = OpenAI.chat.completions.create(
-                model = 'gpt-4',
+                model = 'gpt-3.5-turbo',
                 messages = [
                     {"role": "system", "content": f'Translate the word or text into {language}'},
                     {"role": "user", "content": transcript_result}
                 ]
             )
     reply = str(response)
-    reply_done = reply.split("'")
-    print(reply_done[5])
+    reply_str = reply.split("'")
+    reply_done = reply_str[5].split('"')
+    print(reply_done[0])
     
 
 def on_open(session_opened: aai.RealtimeSessionOpened):
