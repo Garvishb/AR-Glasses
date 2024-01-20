@@ -4,28 +4,30 @@ import openai as OpenAI
 
 from queue import Queue
 aai.settings.api_key = "30ab78c6d7a64cf1b238372e4480b68f"
-OpenAI.api_key = "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"
+OpenAI.api_key = "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"
 
 
 transcript_queue = Queue()
+language = "french"
 
 def translate():
     transcript_result = transcript_queue.get() # Store live transcript
     response = OpenAI.chat.completions.create(
-                model = 'gpt-3.5-turbo-1106',
+                model = 'gpt-4',
                 messages = [
-                    {"role": "system", "content": 'Translate the text to Korean'},
+                    {"role": "system", "content": f'Translate the word or text into {language}'},
                     {"role": "user", "content": transcript_result}
                 ]
             )
-
-    print(response)
-
+    reply = str(response)
+    reply_done = reply.split("'")
+    print(reply_done[5])
+    
 
 def on_open(session_opened: aai.RealtimeSessionOpened):
   "This function is called when the connection has been established."
 
-  print("Session ID:", session_opened.session_id)
+  #print("Session ID:", session_opened.session_id)
 
 def on_data(transcript: aai.RealtimeTranscript):
   "This function is called when a new transcript has been received."
@@ -35,10 +37,10 @@ def on_data(transcript: aai.RealtimeTranscript):
 
   if isinstance(transcript, aai.RealtimeFinalTranscript):
     transcript_queue.put(transcript.text + '')
-    print(transcript.text, end="\r\n")
+    #print(transcript.text, end="\r\n")
     translate()
-  else:
-    print(transcript.text, end="\r")
+  #else:
+    #print(transcript.text, end="\r")
 
 def on_error(error: aai.RealtimeError):
   "This function is called when the connection has been closed."
