@@ -65,5 +65,4 @@ def transcribe_streaming_v2(
 
 
 if __name__ == "__main__":
-    microphone_stream = aai.extras.MicrophoneStream()
-    transcribe_streaming_v2("speech-to-te-411900", microphone_stream)
+    transcribe_streaming_v2("speech-to-te-411900")
