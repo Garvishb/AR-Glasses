@@ -1,14 +1,21 @@
-
 import assemblyai as aai
 import openai as OpenAI
-
+import serial
+import websocket, json
+import pyaudio
 from queue import Queue
+
+
 aai.settings.api_key = "30ab78c6d7a64cf1b238372e4480b68f"
 OpenAI.api_key = "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"
 
+ser = serial.Serial('COM4', 9600) # Change COM1 as needed
+def send_to_serial(data):
+    ser.write(data.encode())
 
 transcript_queue = Queue()
 language = "french"
+
 
 def translate():
     transcript_result = transcript_queue.get() # Store live transcript
@@ -19,9 +26,15 @@ def translate():
                     {"role": "user", "content": transcript_result}
                 ]
             )
+    
     reply = str(response)
-    reply_done = reply.split("'")
-    print(reply_done[5])
+    reply_str = reply.split("'")
+    reply_done = reply_str[5].split('"')
+    translated_text = reply_done[0]
+    print(translated_text)
+
+    # Send text to COM as needed
+    send_to_serial(translated_text) 
     
 
 def on_open(session_opened: aai.RealtimeSessionOpened):
@@ -39,6 +52,8 @@ def on_data(transcript: aai.RealtimeTranscript):
     transcript_queue.put(transcript.text + '')
     #print(transcript.text, end="\r\n")
     translate()
+
+
   #else:
     #print(transcript.text, end="\r")
 
@@ -67,11 +82,8 @@ transcriber.connect()
 # Open a microphone stream
 microphone_stream = aai.extras.MicrophoneStream()
 
+
 # Press CTRL+C to abort
 transcriber.stream(microphone_stream)
 
 transcriber.close()
-
-
-
-
