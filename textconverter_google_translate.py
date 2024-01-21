@@ -14,7 +14,7 @@ OpenAI.api_key = "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"
 #     ser.write(data.encode())
 
 transcript_queue = Queue()
-language = "ko"
+language = "hi"
 
 def google_translate(target: str, text: str) -> dict:
     """Translates text into the target language.
@@ -55,7 +55,7 @@ def on_data(transcript: aai.RealtimeTranscript):
     transcript_queue.put(transcript.text + '')
     #print(transcript.text, end="\r\n")
     transcript_result = transcript_queue.get()
-    google_translate("ko", transcript_result) 
+    google_translate("hi", transcript_result) 
 
 
   #else:
