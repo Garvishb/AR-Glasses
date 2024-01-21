@@ -32,6 +32,7 @@ For real-time transcribing of speech, we used a microphone connected to the Asse
 - We wish to further improve this by adding an onboard camera to detect and inform users about the emotions of people around them. Many with ASD have challenges detecting and sensing emotions of others and themselves. Hence, this would benefit them greatly. 
 -We also wish to move the microphone onto the ESP32 S3 directly, and not have to rely on a separate computer to interface with the AI APIs. If everything is tightly integrated with a cellular connection to the cloud, this would be a truly portable solution.
 
+## Details about the code
 - textconverter files trancribe realtime speech to text and we use different APIs to translate it to different language:
   - textconverter_openai uses ChatGPT API for translation
   - textconverter_google_translate uses Google Cloud API for translation
