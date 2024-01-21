@@ -52,7 +52,7 @@ long lastBeat = 0; //Time at which the last beat occurred
 float beatsPerMinute;
 int beatAvg = 80;
 
-
+bool isWiredConnection = false;
 
 /* Uncomment the initialize the I2C address , uncomment only one, If you get a totally blank screen try the other*/
 #define i2c_Address 0x3c //initialize with the I2C addr 0x3C Typically eBay OLED's
@@ -120,6 +120,8 @@ void setup()   {
 
 String printBuffer;
 
+int lastDeletedTime = millis();
+
 void loop() {
 
   // text display tests
@@ -153,46 +155,50 @@ void loop() {
       beatAvg /= RATE_SIZE;
       
     }
-  }
-
-  /*
-  Serial.print("IR=");
-  Serial.print(irValue);
-  Serial.print(", BPM=");
-  Serial.print(beatsPerMinute);
-  Serial.print(", Avg BPM=");
-  Serial.print(beatAvg);
-*/
-  
+  }  
   
   display.clearDisplay();
 
-  ////if (irValue < 50000)
+  ////if (irValue < 50000)k
     ////Serial.print(" No finger?");
   if(irValue > 50000){
     display.setCursor(90, 54);
     display.print(String(beatAvg) + "BPM");
   }
-    
-  ////Serial.println();
-  
-  // while(Serial.available() > 0){
-  //   char incomingChar = Serial.read();
-    
-  //   Serial.print("X: ");
-  //   Serial.print(display.getCursorY());
-  //   Serial.print(", Y: ");
-  //   if(incomingChar != '\n'){
-  //     printBuffer.concat(incomingChar);
-  //   }
-  //   Serial.println(display.getCursorX());
-  //   Serial.print(printBuffer);
-  // }
 
-  if (printBuffer.length() > NUM_ROWS_MAX * numCharsPerRow){
+  
+  while(Serial.available() > 0){
+    char incomingChar = Serial.read();
+    
+    Serial.print("X: ");
+    Serial.print(display.getCursorY());
+    Serial.print(", Y: ");
+    // if(incomingChar != '\n'){
+      printBuffer.concat(incomingChar);
+    // }
+    Serial.println(display.getCursorX());
+    Serial.print(printBuffer);
+    isWiredConnection = true;
+    lastDeletedTime = millis();
+  }
+
+
+  display.setCursor(10, 54);
+  if(isWiredConnection){
+    display.print("Wired");
+  }
+  else{
+    display.print("Wireless");
+  }
+
+  // Serial.println(isWiredConnection);
+  
+
+  if (printBuffer.length() > NUM_ROWS_MAX * numCharsPerRow || millis() - lastDeletedTime > 2000){
     //go until min length 
-    (printBuffer.length() - NUM_ROWS_MAX * numCharsPerRow); //if a longer than 13 char string comes in, I might need to remove more than 1 row. 
+    //(printBuffer.length() - NUM_ROWS_MAX * numCharsPerRow); //if a longer than 13 char string comes in, I might need to remove more than 1 row. 
     printBuffer = printBuffer.substring(numCharsPerRow);
+    lastDeletedTime = millis();
   }
 
   
@@ -232,10 +238,11 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   ////Serial.print("X: ");
   ////Serial.print(display.getCursorY());
   ////Serial.print(", Y: ");
-  if(incomingChar != '\n'){
-    printBuffer.concat(incomingChar);
-  }
+  // if(incomingChar != '\n'){
+  printBuffer.concat(incomingChar);
+  // }
   ////Serial.println(display.getCursorX());
   ////Serial.print(printBuffer);
+  isWiredConnection = false;
+  lastDeletedTime = millis();
 }
-
