@@ -6,6 +6,7 @@ import assemblyai as aai
 
 def transcribe_streaming_v2(
     project_id: str,
+    # content
     audio_file: str,
 ) -> cloud_speech.StreamingRecognizeResponse:
     """Transcribes audio from audio file stream.
@@ -23,6 +24,7 @@ def transcribe_streaming_v2(
     # Reads a file as bytes
     with open(audio_file, "rb") as f:
         content = f.read()
+
 
     # In practice, stream should be a generator yielding chunks of audio data
     chunk_length = len(content) // 5
@@ -64,5 +66,79 @@ def transcribe_streaming_v2(
     return responses
 
 
-if __name__ == "__main__":
-    transcribe_streaming_v2("speech-to-te-411900")
+
+# import sounddevice as sd
+# import numpy as np
+# import wave
+
+# class mic_data():
+#     def __init__(self):
+#         self.sample_rate = 10000
+#         self.channels = 2
+#         self.duration = 1
+#         self.audio_data = []
+
+#     def callback(self, indata, frames, time, status):
+#         if status:
+#             print(status)
+#         self.audio_data.append(indata.copy())
+
+#     def record_audio(self):
+#         with sd.InputStream(callback=self.callback, channels=self.channels, samplerate=self.sample_rate):
+#             sd.sleep(int(self.duration * 1000))
+
+#         audio_array = np.concatenate(self.audio_data, axis=0)
+
+#         with wave.open('audio.wav', 'wb') as wf:
+#             wf.setnchannels(self.channels)
+#             wf.setsampwidth(2)  # Adjust based on your requirements
+#             wf.setframerate(self.sample_rate)
+#             wf.writeframes(audio_array.tobytes())
+            
+
+# if __name__ == "__main__":
+#     mic = mic_data()
+#     mic.record_audio()
+#     transcribe_streaming_v2("speech-to-te-411900", "audio.wav")
+
+
+# import os
+# import time
+# import playsound
+# import speech_recognition as sr
+# from gtts import gTTS
+
+
+# def speak(text):
+#     tts = gTTS(text=text, lang="en")
+#     filename = "voice.mp3"
+#     tts.save(filename)
+#     playsound.playsound(filename)
+
+
+# def get_audio():
+#     r = sr.Recognizer()
+#     with sr.Microphone() as source:
+#         audio = r.listen(source)
+#         said = ""
+
+#         try:
+#             said = r.recognize_google(audio)
+#             print(said)
+#         except Exception as e:
+#             print("Exception: " + str(e))
+
+#     return said
+#     # return audio
+
+# # text = get_audio()
+
+
+# # if "hello" in text:
+# #     speak("hello, how are you?")
+# # elif "what is your name" in text:
+# #     speak("My name is Tim")
+
+# if __name__ == "__main__":
+#     audio = get_audio()
+#     transcribe_streaming_v2("speech-to-te-411900", audio)
