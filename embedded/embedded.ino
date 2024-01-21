@@ -1,8 +1,9 @@
 #define NUM_ROWS_MAX 5
 #define CHAR_WIDTH 6
 #define CHAR_HEIGHT 8
-#define WHITESPACE_PERCENTAGE 0.07
-int numCharsPerRow = (128 / CHAR_WIDTH) * (1 - 2 * WHITESPACE_PERCENTAGE);
+#define WHITESPACE_PERCENTAGE 0.2
+int numCharsPerRow = (128 / CHAR_WIDTH) * 0.5;
+//  * (1 - 3 * WHITESPACE_PERCENTAGE);
 
 #include <SPI.h>
 #include <Wire.h>
@@ -24,12 +25,12 @@ uint8_t broadcastAddress[] = {0x34, 0x85, 0x18, 0xac, 0x08, 0x28};
 //34:85:18:ac:08:28 is for the transmitter ESP
 
 // Define variables to store incoming readings
-char incomingChar;
+String incomingChar;
 
 //Structure example to send data
 //Must match the receiver structure
 typedef struct struct_message {
-    char character;
+    String character;
 } struct_message;
 
 // Create a struct_message to hold incoming sensor readings
@@ -101,6 +102,7 @@ void setup()   {
     Serial.println("Failed to add peer");
     return;
   }
+
   // Register for a callback function that will be called when data is received
   esp_now_register_recv_cb(OnDataRecv);
 
@@ -162,39 +164,40 @@ void loop() {
   ////if (irValue < 50000)k
     ////Serial.print(" No finger?");
   if(irValue > 50000){
-    display.setCursor(90, 54);
+    // display.setCursor(90, 54);
+    display.setCursor(10, 54);
     display.print(String(beatAvg) + "BPM");
   }
 
-  
+
   while(Serial.available() > 0){
     char incomingChar = Serial.read();
     
-    Serial.print("X: ");
-    Serial.print(display.getCursorY());
-    Serial.print(", Y: ");
+    // Serial.print("X: ");
+    // Serial.print(display.getCursorY());
+    // Serial.print(", Y: ");
     // if(incomingChar != '\n'){
       printBuffer.concat(incomingChar);
     // }
-    Serial.println(display.getCursorX());
-    Serial.print(printBuffer);
+    // Serial.println(display.getCursorX());
+    // Serial.print(printBuffer);
     isWiredConnection = true;
     lastDeletedTime = millis();
   }
 
 
-  display.setCursor(10, 54);
-  if(isWiredConnection){
-    display.print("Wired");
-  }
-  else{
-    display.print("Wireless");
-  }
+  
+  // if(isWiredConnection){
+  //   display.print("Wired");
+  // }
+  // else{
+  //   display.print("Wireless");
+  // }
 
   // Serial.println(isWiredConnection);
   
 
-  if (printBuffer.length() > NUM_ROWS_MAX * numCharsPerRow || millis() - lastDeletedTime > 2000){
+  if (printBuffer.length() > NUM_ROWS_MAX * numCharsPerRow || millis() - lastDeletedTime > 3000){
     //go until min length 
     //(printBuffer.length() - NUM_ROWS_MAX * numCharsPerRow); //if a longer than 13 char string comes in, I might need to remove more than 1 row. 
     printBuffer = printBuffer.substring(numCharsPerRow);
@@ -203,7 +206,7 @@ void loop() {
 
   
   for(int i = 0; i < printBuffer.length() ; i++){
-    int x = (i % numCharsPerRow) * CHAR_WIDTH + int(128 * WHITESPACE_PERCENTAGE);
+    int x = (i % numCharsPerRow) * CHAR_WIDTH + 10;
     int y = (i / numCharsPerRow) * CHAR_HEIGHT + CHAR_HEIGHT;
     display.setCursor(x, y);
     display.write(printBuffer[i]);
@@ -227,22 +230,38 @@ void loop() {
   // display.clearDisplay();
 }
 
-void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
-  memcpy(&incomingCharacter, incomingData, sizeof(incomingCharacter));
-  // Serial.print("Bytes received: ");
-  // Serial.println(len);
-  incomingChar = incomingCharacter.character;
-  //// Serial.print("incoming char: ");
-  //// Serial.println(incomingChar);
+// void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
+//   memcpy(&incomingCharacter, incomingData, sizeof(incomingCharacter));
+//   // Serial.print("Bytes received: ");
+//   // Serial.println(len);
+//   // callback when data is recv from Master
+
+//   incomingChar = incomingCharacter.character;
+//   //// Serial.print("incoming char: ");
+//   Serial.println(incomingChar);
+  
     
-  ////Serial.print("X: ");
-  ////Serial.print(display.getCursorY());
-  ////Serial.print(", Y: ");
-  // if(incomingChar != '\n'){
-  printBuffer.concat(incomingChar);
+//   ////Serial.print("X: ");
+//   ////Serial.print(display.getCursorY());
+//   ////Serial.print(", Y: ");
+//   // if(incomingChar != '\n'){
+//   printBuffer.concat(incomingChar);
+//   // }
+//   ////Serial.println(display.getCursorX());
+//   Serial.println(printBuffer);
+//   isWiredConnection = false;
+//   lastDeletedTime = millis();
+// }
+
+void OnDataRecv(const uint8_t *mac_addr, const uint8_t *data, int data_len) {
+   char* buff = (char*) data;
+  String buffStr = String(buff);
+  Serial.println(buffStr);
+
+  printBuffer.concat(buffStr + "   ");
   // }
   ////Serial.println(display.getCursorX());
-  ////Serial.print(printBuffer);
+  Serial.println(printBuffer);
   isWiredConnection = false;
   lastDeletedTime = millis();
 }

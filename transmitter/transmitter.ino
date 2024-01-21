@@ -23,12 +23,12 @@ String success;
 
 //Structure example to send data
 //Must match the receiver structure
-typedef struct struct_message {
-    char character;
-} struct_message;
+// typedef struct struct_message {
+//   char[] character;
+// } struct_message;
 
 // Create a struct_message called BME280Readings to hold sensor readings
-struct_message charToBeSent;
+// struct_message charToBeSent;
 
 esp_now_peer_info_t peerInfo;
 
@@ -36,7 +36,8 @@ esp_now_peer_info_t peerInfo;
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
   Serial.print("\r\nLast Packet Send Status:\t");
   Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
-  Serial.println(charToBeSent.character);
+  
+  // Serial.println(charToBeSent.character);
   if (status ==0){
     success = "Delivery Success :)";
   }
@@ -80,9 +81,18 @@ void setup() {
 void loop() {
 
    while(Serial.available() > 0){
-    charToBeSent.character = Serial.read();
+    // charToBeSent.character = Serial.readStringUntil('\n');
+    // Serial.println(charToBeSent.character);
+    
+    
+    String helloStr = Serial.readStringUntil('\n');
+    Serial.println(helloStr);
+    uint8_t *buffer = (uint8_t*) helloStr.c_str();
+    size_t sizeBuff = sizeof(buffer) * helloStr.length();
+    esp_err_t result = esp_now_send(broadcastAddress, buffer, sizeBuff);
+    // charToBeSent.character = Serial.read();
     // Send message via ESP-NOW
-    esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &charToBeSent, sizeof(charToBeSent));
+    // esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &charToBeSent, sizeof(charToBeSent));
     if (result == ESP_OK) {
       Serial.println("Sent with success");
     }
