@@ -6,8 +6,8 @@ import pyaudio
 from queue import Queue
 
 
-aai.settings.api_key = "30ab78c6d7a64cf1b238372e4480b68f"
-OpenAI.api_key = "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"
+aai.settings.api_key = "private_key"
+OpenAI.api_key = "private_key"
 
 # ser = serial.Serial('COM4', 9600) # Change COM1 as needed
 # def send_to_serial(data):
