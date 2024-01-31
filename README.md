@@ -1,4 +1,4 @@
-# AR-Glasses
+# MediLens
 ## Inspiration
 We were inspired by one of our close friends, who suffers from moderate autism spectrum disorder, as well as many others on the autism spectrum. Oftentimes, he would struggle with visual and audio sensory overload, where he feels overwhelmed by the sheer amount of sensory input coming from the outside world. This motivated us to create a gadget that would make a change in his life and the world. 
 
